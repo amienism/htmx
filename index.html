@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+
+</head>
+
+<style>
+    body {
+        padding: 0 20rem;
+    }
+
+    todoList {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    table, th, tr, td  {
+        border: 1px solid black;
+    }
+
+    #loading {
+        width: 50px;
+        height: 50px;
+    }
+
+    .deleteButton {
+        color: red;
+    }
+</style>
+
+<body>
+    <h1>To Do List</h1>
+    <form action="" hx-post="https://calm-plum-jaguar-tutu.cyclic.app/todos" id="addTodo" hx-swap="none" hx-target="#todoList">
+        <label for="todoName">Todo Name</label>
+        <input type="text" name="todoName">
+        <label for="isComplete">Is Complete</label>
+        <input type="checkbox" name="isComplete">
+        <button type="submit">Add</button>
+    </form>
+
+    <div id="todoList" hx-get="https://calm-plum-jaguar-tutu.cyclic.app/todos" hx-trigger="load" hx-indicator="#loading">
+        
+        <img id="loading" src="./loading.gif" alt="" class="htmx-indicator" hx-on>
+    </div>
+    
+</body>
+
+</html>
+
+<script>
+    document.getElementById('todoList').addEventListener('htmx:afterRequest', function (event) {
+        const element = event.detail.elt;
+        const todos = JSON.parse(event.detail.elt.innerText)['data'];
+
+        element.innerHTML = '';
+
+        let row = '';
+
+        todos.forEach(function (todo, i) {
+            row += `
+                <tr>
+                    <td>${todo.todoName}</td>                    
+                    <td>${todo.isComplete}</td>                    
+                    <td>
+                        <button class="deleteButton" hx-delete="https://calm-plum-jaguar-tutu.cyclic.app/todos/${todo._id}">Delete</button>    
+                    </td>                    
+                </tr>
+            `
+        });
+
+        const render = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${row}
+                </tbody>
+        `
+
+        element.innerHTML = render;
+        });
+
+    
+
+</script>
