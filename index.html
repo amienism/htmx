@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/htmx.org@1.9.9"></script>
     <script src="https://unpkg.com/htmx.org@1.9.9/dist/ext/client-side-templates.js"></script>
     <script src="https://unpkg.com/mustache@latest"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
   </head>
 
   <style>
@@ -43,17 +44,21 @@
   </style>
 
   <body>
-    <h1>To Do List</h1>
-    <form action="" hx-post="https://calm-plum-jaguar-tutu.cyclic.app/todos" id="addTodo" hx-swap="none" hx-target="#loadTodo">
-      <label for="todoName">Todo Name</label>
-      <input type="text" name="todoName" />
-      <label for="isComplete">Is Complete</label>
-      <input type="checkbox" name="isComplete" />
-      <button type="submit">Add</button>
-    </form>
-
+    
     <div hx-ext="client-side-templates">
-      <div id="loadTodo" hx-get="https://calm-plum-jaguar-tutu.cyclic.app/todos" hx-swap="outerHTML" hx-target="#content" hx-trigger="load, from:body" mustache-template="todoTable"></div>
+      <h1>To Do List</h1>
+      <form action="" hx-post="https://calm-plum-jaguar-tutu.cyclic.app/todos" id="addTodo" hx-swap="beforeend" hx-target="#content" mustache-template="todoRow">
+        <label for="todoName">Todo Name</label>
+        <input type="text" name="todoName" />
+        <input hidden type="text" name="isComplete" value="false"/>
+        <button type="submit">Add</button>
+      </form>
+
+      <div id="demoRow">
+
+      </div>
+  
+      <div id="loadTodo" hx-get="https://calm-plum-jaguar-tutu.cyclic.app/todos" hx-swap="innerHTML" hx-target="#content" hx-trigger="load" mustache-template="todoRow"></div>
 
       <table>
             <thead>
@@ -69,16 +74,16 @@
         </table>
     </table>
       
-    <template id="todoTable">
-              {{#data}}
-              <tr>
-                  <td>{{ todoName }}</td>            
-                  <td>{{ isComplete }}</td>            
-                  <td>
-                    <button hx-delete="https://calm-plum-jaguar-tutu.cyclic.app/todos/{{_id}}" hx-swap="none" hx-target="#loadTodo">Delete</button>
-                  </td>
-              </tr>
-                {{/data}}
+    <template id="todoRow">
+          {{#data}}
+            <tr id="todo-{{_id}}">
+                <td>{{ todoName }}</td>            
+                <td>{{ isComplete }}</td>            
+                <td>
+                  <button hx-delete="https://calm-plum-jaguar-tutu.cyclic.app/todos/{{_id}}" _="on htmx:afterOnLoad remove #todo-{{_id}}">Delete</button>
+                </td>
+            </tr>
+          {{/data}}
       </template>
     </div>
   </body>
